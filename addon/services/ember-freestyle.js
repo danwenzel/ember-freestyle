@@ -5,6 +5,7 @@ import { isPresent } from '@ember/utils';
 import { A } from '@ember/array';
 import Service from '@ember/service';
 import { Promise } from 'rsvp';
+import { computed } from '@ember/object';
 
 export default Service.extend({
   showLabels: true,
@@ -31,9 +32,9 @@ export default Service.extend({
     this.hljsLanguagePromises = {}
   },
 
-  hljsUrl() {
+  hljsUrl: computed('hljsVersion', function() {
     return `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${this.hljsVersion}/highlight.min.js`;
-  },
+  }),
 
   hljsThemeUrl(theme) {
     return `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${this.hljsVersion}/styles/${theme}.min.css`;
@@ -46,12 +47,8 @@ export default Service.extend({
   ensureHljs() {
     if (!this.hljsPromise) {
       this.hljsPromise = new Promise((resolve) => {
-        let src = this.hljsUrl();
-        let script = document.createElement('script');
-        script.type = 'application/javascript';
-        script.src = src;
+        const script = document.getElementById('ember-freestyle__hljs-script');
         script.onload = resolve;
-        document.body.appendChild(script);
       });
     }
     return this.hljsPromise;
